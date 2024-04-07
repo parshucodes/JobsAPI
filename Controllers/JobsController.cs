@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using JobsAPI.Models;
+using JobsAPI.WebModels;
 using JobsAPI.WebModels.DepartmentWebModel;
 using JobsAPI.WebModels.JobWebModel;
 using JobsAPI.WebModels.LocationWebModel;
@@ -154,5 +155,65 @@ namespace JobsAPI.Controllers
             }
         
         }
+
+        [HttpPost("List")]
+        public async Task<ActionResult<ListJobResponseWebModel>> ListJobs(ListDataRequestWebModel listWebModel)
+        {
+            try
+            {
+                if (listWebModel.PageNo < 1)
+                    return BadRequest("Page Number cannot be less than 1");
+
+                if (listWebModel.PageSize < 1)
+                    return BadRequest("Page Size cannot be less than 1");
+
+                int pageNo = listWebModel.PageNo - 1;
+                int pageSize = listWebModel.PageSize;
+
+                IQueryable<Job> query = _context.Jobs.Include("Department").Include("Location").OrderByDescending(i => i.PostedDate);
+
+                string queryString = listWebModel.Q == null ? String.Empty : listWebModel.Q.Trim().ToLower();
+
+                if (!string.IsNullOrEmpty(listWebModel.Q))
+                {
+                    query = query.Where(e => (e.Code == null ? false : e.Code.ToLower().Contains(queryString)) ||
+                                        (e.Title == null ? false : e.Title.ToLower().Contains(queryString)) ||
+                                        (e.Location == null ? false : (e.Location.Title == null ? false : e.Location.Title.ToLower().Contains(queryString))) ||
+                                        (e.Department == null ? false : (e.Department.Title == null ? false : e.Department.Title.ToLower().Contains(queryString))));
+                }
+
+                if (listWebModel.LocationId != null)
+                {
+                    query = query.Where(e => e.LocationId == listWebModel.LocationId);
+                }
+
+                if (listWebModel.DepartmentId != null)
+                {
+                    query = query.Where(e => e.DepartmentId == listWebModel.DepartmentId);
+                }
+
+                var result = await query.ToListAsync();
+
+                return new ListJobResponseWebModel
+                {
+                    Total = result.Count,
+                    Data = result.Skip(pageNo * pageSize).Take(pageSize).Select(job => new GetJobResponseWebModelMinimal
+                    {
+                        Id = job.JobId,
+                        Code = job.Code,
+                        Title = job.Title,
+                        PostedDate = job.PostedDate,
+                        ClosingDate = job.ClosingDate,
+                        Department = job.Department?.Title ?? "",
+                        Location = job.Location?.Title ?? ""
+                    })
+                };
+            }
+            catch (Exception ex)
+            {
+                return StatusCode((int)HttpStatusCode.InternalServerError, "Error retrieving job list");
+            }
+        }
+
     }
 }

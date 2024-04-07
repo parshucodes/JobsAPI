@@ -153,3 +153,4 @@ C:\Users\parsh\Documents\Projects\angular_auth\JobsAPI\JobsAPI\bin\Debug\net8.0\
 C:\Users\parsh\Documents\Projects\angular_auth\JobsAPI\JobsAPI\bin\Debug\net8.0\Serilog.Sinks.Console.dll
 C:\Users\parsh\Documents\Projects\angular_auth\JobsAPI\JobsAPI\bin\Debug\net8.0\Serilog.Sinks.Debug.dll
 C:\Users\parsh\Documents\Projects\angular_auth\JobsAPI\JobsAPI\bin\Debug\net8.0\Serilog.Sinks.File.dll
+C:\Users\parsh\Documents\Projects\angular_auth\JobsAPI\JobsAPI\obj\Debug\net8.0\JobsAPI.sourcelink.json
