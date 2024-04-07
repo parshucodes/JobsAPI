@@ -4,6 +4,7 @@ using JobsAPI.WebModels;
 using JobsAPI.WebModels.DepartmentWebModel;
 using JobsAPI.WebModels.JobWebModel;
 using JobsAPI.WebModels.LocationWebModel;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -12,6 +13,7 @@ using System.Reflection;
 
 namespace JobsAPI.Controllers
 {
+    [Authorize]
     [Route("api/v{version:apiVersion}/[controller]")]
     [ApiVersion("1.0")]
     [ApiController]
@@ -33,7 +35,11 @@ namespace JobsAPI.Controllers
             try
             {
                 var result = await _context.Jobs.OrderByDescending(i=>i.PostedDate).ToListAsync();
+                _logger.LogInformation("The results are {@result}", result);
                 return Ok(result);
+                
+
+
             }
             catch (Exception ex)
             {
